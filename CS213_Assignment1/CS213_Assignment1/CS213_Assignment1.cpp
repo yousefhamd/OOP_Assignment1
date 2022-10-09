@@ -2,8 +2,11 @@
 
 int main()
 {
-	BigDecimalInt first("222222222222222222222222222222222222222222222222");
-	BigDecimalInt second("222222222222222222222222222222222222222222222222");
-	cout << first + second;
+	BigDecimalInt first("+123456789090090");
+	BigDecimalInt second("-123456789003957634786928");
+	string s = second.get_big_decimal();
+	first.attach_sign();
+	first.equalize_size(s);
+	cout << first;
 	return 0;
 }

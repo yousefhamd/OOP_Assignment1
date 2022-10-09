@@ -1,6 +1,2 @@
-﻿  BigDecimalInt.cpp
-c:\users\redline\source\repos\cs213_assignment1\cs213_assignment1\bigdecimalint.h(25): warning C4018: '<': signed/unsigned mismatch
-  CS213_Assignment1.cpp
-c:\users\redline\source\repos\cs213_assignment1\cs213_assignment1\bigdecimalint.h(25): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
-  CS213_Assignment1.vcxproj -> C:\Users\REDLINE\source\repos\CS213_Assignment1\Debug\CS213_Assignment1.exe
+﻿  CS213_Assignment1.cpp
+  CS213_Assignment1.vcxproj -> C:\Users\REDLINE\source\repos\OOP_Assignment1\CS213_Assignment1\Debug\CS213_Assignment1.exe

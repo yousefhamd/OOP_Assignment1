@@ -10,20 +10,15 @@ public:
 
 	BigDecimalInt(string b_d);
 
+	string get_big_decimal() {
+		return big_decimal;
+	}
+
 	friend ostream& operator << (ostream& out, BigDecimalInt b);
 
-	void equalize_size(string& first, string& second) {
-		string s;
-		if (first.length() > second.length()) {
-			s = string('0', first.length() - second.length());
-			second = s + second;
-		}
-		else
-		{
-			s = string('0', second.length() - first.length());
-			first = s + first;
-		}
-	}
+	char attach_sign();
+
+	void equalize_size(string& second);
 
 	BigDecimalInt operator+ (BigDecimalInt anotherDec) {
 		BigDecimalInt resultDec;
