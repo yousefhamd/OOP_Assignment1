@@ -13,33 +13,26 @@ BigDecimalInt :: BigDecimalInt(string b_d) {
 		cout << "Invalid decimal number" << endl;
 }
 
-char BigDecimalInt :: attach_sign() {
+string BigDecimalInt :: get_big_decimal() {
+	return big_decimal;
+}
+
+char BigDecimalInt :: attach_sign(string& number) {
 	string temp = "";
 	char sign = ' ';
-	for (char digit : big_decimal) { // delete the sign from the number
+	for (char digit : number) { // delete the sign from the number
 		if (digit == '-' || digit == '+') {
 			sign = digit;
 			continue;
 		}
 		temp += digit;
 	}
-	big_decimal = "";
-	for (char digit : temp) { // refill the number
-		big_decimal += digit;
-	}
+	number = temp;
 	return sign;
 }
 
 void BigDecimalInt :: equalize_size(string& second) {
 	int n_first_zeros = 0, n_second_zeros = 0;
-	if (big_decimal[0] == '+' || big_decimal[1] == '-') {
-		n_first_zeros--;
-		n_second_zeros++;
-	}
-	if (second[0] == '+' || second[0] == '-') {
-		n_second_zeros--;
-		n_first_zeros++;
-	}
 	if (big_decimal.length() > second.length()) {
 		n_first_zeros += big_decimal.length() - second.length();
 		second = string(n_first_zeros, '0') + second;
@@ -49,6 +42,24 @@ void BigDecimalInt :: equalize_size(string& second) {
 		n_second_zeros += second.length() - big_decimal.length();
 		big_decimal = string(n_second_zeros, '0') + big_decimal;
 	}
+}
+
+void BigDecimalInt :: clear_zeros(string& number) {
+	string temp = "";
+	for (int i = 0; i <= number.length(); i++) {
+		if (number[i] == '0' && temp.length() == 0)
+			continue;
+		temp += number[i];
+	}
+	number = temp;
+}
+
+int BigDecimalInt::size() {
+	return big_decimal.length();
+}
+
+int BigDecimalInt::sign() {
+	return (big_decimal[0] == '+' || big_decimal[0] == ' ') ? 1 : 0;
 }
 
 ostream& operator << (ostream& out, BigDecimalInt b) {
