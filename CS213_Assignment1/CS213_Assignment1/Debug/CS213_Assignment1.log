@@ -1,7 +1,7 @@
 ﻿  BigDecimalInt.cpp
 c:\users\redline\source\repos\oop_assignment1\cs213_assignment1\cs213_assignment1\bigdecimalint.h(46): warning C4018: '<': signed/unsigned mismatch
 c:\users\redline\source\repos\oop_assignment1\cs213_assignment1\cs213_assignment1\bigdecimalint.h(58): warning C4018: '<': signed/unsigned mismatch
-c:\users\redline\source\repos\oop_assignment1\cs213_assignment1\cs213_assignment1\bigdecimalint.cpp(49): warning C4018: '<=': signed/unsigned mismatch
+c:\users\redline\source\repos\oop_assignment1\cs213_assignment1\cs213_assignment1\bigdecimalint.cpp(50): warning C4018: '<=': signed/unsigned mismatch
   CS213_Assignment1.cpp
 c:\users\redline\source\repos\oop_assignment1\cs213_assignment1\cs213_assignment1\bigdecimalint.h(46): warning C4018: '<': signed/unsigned mismatch
 c:\users\redline\source\repos\oop_assignment1\cs213_assignment1\cs213_assignment1\bigdecimalint.h(58): warning C4018: '<': signed/unsigned mismatch

@@ -2,11 +2,10 @@
 
 int main()
 {
-	BigDecimalInt first("+123456789090090");
-	BigDecimalInt second("123456789003957634786928");
-	if(first > second)
-		cout << first.sign() << endl;
-	cout << first;
-	cout << first.size();
+	BigDecimalInt num1("123456789012345678901234567890");
+	BigDecimalInt num2("-113456789011345678901134567890");
+	cout << (num1 == num2);
+	num1 = num2;
+	cout << num1;
 	return 0;
 }

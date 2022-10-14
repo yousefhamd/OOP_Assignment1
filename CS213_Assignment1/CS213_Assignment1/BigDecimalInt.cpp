@@ -33,6 +33,7 @@ char BigDecimalInt :: attach_sign(string& number) {
 
 void BigDecimalInt :: equalize_size(string& second) {
 	int n_first_zeros = 0, n_second_zeros = 0;
+
 	if (big_decimal.length() > second.length()) {
 		n_first_zeros += big_decimal.length() - second.length();
 		second = string(n_first_zeros, '0') + second;
@@ -55,7 +56,10 @@ void BigDecimalInt :: clear_zeros(string& number) {
 }
 
 int BigDecimalInt::size() {
-	return big_decimal.length();
+	if (big_decimal[0] == '+' || big_decimal[0] == '-')
+		return big_decimal.length() - 1;
+	else
+		return big_decimal.length();
 }
 
 int BigDecimalInt::sign() {

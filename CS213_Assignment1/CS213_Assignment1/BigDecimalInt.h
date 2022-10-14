@@ -83,9 +83,31 @@ public:
 	bool operator== (BigDecimalInt anotherDec) {
 		char sign_first = attach_sign(big_decimal);
 		char sign_second = attach_sign(anotherDec.big_decimal);
+		if (((sign_first == ' ' || sign_first == '+') && sign_second == '-') || (sign_first == '-' && (sign_second == ' ' || sign_second == '+')))
+			goto no;
+		else {
+			if (big_decimal == anotherDec.big_decimal)
+				goto yes;
+			else
+				goto no;
+		}
+	yes:
 		clear_zeros(big_decimal);
 		clear_zeros(anotherDec.big_decimal);
-		return (big_decimal == anotherDec.big_decimal);
+		big_decimal = sign_first + big_decimal;
+		anotherDec.big_decimal = sign_second + anotherDec.big_decimal;
+		return true;
+	no:
+		clear_zeros(big_decimal);
+		clear_zeros(anotherDec.big_decimal);
+		big_decimal = sign_first + big_decimal;
+		anotherDec.big_decimal = sign_second + anotherDec.big_decimal;
+		return false;
+	}
+
+	BigDecimalInt operator= (BigDecimalInt anotherDec) {
+		big_decimal = anotherDec.big_decimal;
+		return *this;
 	}
 
 	int size();
