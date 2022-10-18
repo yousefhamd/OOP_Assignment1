@@ -7,5 +7,16 @@ int main()
 	cout << (num1 == num2);
 	num1 = num2;
 	cout << num1;
+	
+	result = second - first;
+
+	if (second < first)
+		cout << " true";
+	else
+		cout << " false";
+
+	cout<<" num2 - num1 = " << result;
+	
+
 	return 0;
 }
