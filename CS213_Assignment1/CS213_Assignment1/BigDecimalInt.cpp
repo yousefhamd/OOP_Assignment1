@@ -111,8 +111,6 @@ BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 		{
 			res = '1' + res;
 		}
-		cout << " result: " << result << endl;
-		cout << res << endl;
 
 		return res;	
 	}
@@ -137,8 +135,6 @@ BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 		{
 			res = '1' + res;
 		}
-		cout << " result: " << result << endl;
-		cout << res << endl;
 
 		if ( sign1 == '+')
 		{
@@ -163,20 +159,66 @@ BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 	if (big_decimal < anotherDec.big_decimal)
 	{
 		equalize_size(anotherDec.big_decimal);
-
+		
 		for (int i = anotherDec.big_decimal.length() - 1; i >= 0; i--)
 		{
 			//checking if the number needs to borrow from the next number 
-			while (big_decimal[i] > anotherDec.big_decimal[i])
+
+			if (i == 0)  
 			{
-				anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
-				anotherDec.big_decimal[i - 1] = anotherDec.big_decimal[i - 1] - 1;
+				//the first digit in the number is smaller than the other one
+				if (anotherDec.big_decimal[0] < big_decimal[0])
+				{
+					result =  int(big_decimal[i] - '0') - int(anotherDec.big_decimal[i] - '0');   //subtracting the two integers 
+					res = char(result + '0') + res;  //returning result to a string
+					return '-' + res;
+				}
 			}
-			cout << big_decimal << " " << anotherDec.big_decimal << endl;
+
+			int counter = 0;
+
+			
+			while ((anotherDec.big_decimal[i] < big_decimal[i] )&& i!=0)
+			{
+				//checking the occurance of zeros in the number
+				if (anotherDec.big_decimal[i - 1] == '0')
+				{
+					counter += 1;
+					i--;
+					if (anotherDec.big_decimal[i - 1] != '0')
+					{
+						anotherDec.big_decimal[i - 1] -= 1;
+					}
+					continue;
+				}
+				
+				if (counter != 0)
+				{
+					//replacing zeros with the bored number from the perivous digit
+					for (int j = 0; j < counter; j++)
+					{
+						
+						if (anotherDec.big_decimal[i] == '0')
+						{
+							anotherDec.big_decimal[i] = '9';
+						}
+						i++;
+					}
+					anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
+
+					break;
+				}
+				//borowing from the pervious digit 
+				else
+				{
+					anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
+					anotherDec.big_decimal[i - 1] = anotherDec.big_decimal[i - 1] - 1;
+				}
+
+			}
 			result = int(anotherDec.big_decimal[i] - '0') - int(big_decimal[i] - '0');   //subtracting the two integers 
 			res = char(result + '0') + res;  //returning result to a string
 		}
-
 		sign = '-';
 
 		return sign + res;
@@ -188,14 +230,60 @@ BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 	 {
 
 		equalize_size(anotherDec.big_decimal);
-
-		for (int i = anotherDec.big_decimal.length() - 1; i >= 0; i--)
+		
+		for (int i = anotherDec.big_decimal.length() - 1 ; i >= 0; i--)
 		{
 			//checking if the number needs to borrow from the next number 
-			while (big_decimal[i] < anotherDec.big_decimal[i])
+			if (i == 0)
 			{
-				big_decimal[i - 1] -= 1;
-				big_decimal[i]+=  10;
+				//the first digit in the number is smaller than the other one
+				if (big_decimal[0] < anotherDec.big_decimal[0])
+				{
+					result = int(anotherDec.big_decimal[i] - '0') - int(big_decimal[i] - '0') ;   //subtracting the two integers 
+					res = char(result + '0') + res;  //returning result to a string
+					return '-' + res;
+				}
+
+			}
+
+			int counter = 0;
+	
+			while ((big_decimal[i] < anotherDec.big_decimal[i] && i!=0))
+			{
+				//checking the occurance of zeros in the number
+				if (big_decimal[i - 1] == '0')
+				{
+					counter += 1;
+					i--;
+					if (big_decimal[i - 1] != '0') 
+					{
+						big_decimal[i - 1] -= 1;
+					}
+					continue;
+				}
+
+				if (counter != 0)
+				{
+					//replacing zeros with the bored number from the perivous digit
+					for (int j = 0; j < counter ; j++) 
+					{
+						if (big_decimal[i] == '0')
+						{
+							big_decimal[i] = '9';
+						} 
+						i++;
+					}
+					big_decimal[i] = big_decimal[i] + 10;
+
+					break;
+				}
+
+				else
+				{
+					//borowing from the pervious digit 
+					big_decimal[i] = big_decimal[i] + 10;
+					big_decimal[i - 1] = big_decimal[i - 1] - 1;
+				}
 				
 			}
 			result = int(big_decimal[i]-'0') - int(anotherDec.big_decimal[i]-'0');   //subtracting the two integers 
@@ -204,7 +292,6 @@ BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 		return  sign + res;
      }
 }
-
 
 
  bool  BigDecimalInt::operator< (BigDecimalInt anotherDec)
