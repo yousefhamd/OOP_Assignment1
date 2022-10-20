@@ -443,6 +443,165 @@ BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 		return sign + resultDec ;
 		
 	 }
+ }BigDecimalInt BigDecimalInt::operator+ (BigDecimalInt anotherDec)
+ {
+	 //BigDecimalInt
+	 string resultDec;
+	 int res_digit = 0;
+
+	 //positive numbers only
+	 if(big_decimal[0] != '-' && anotherDec.big_decimal[0] != '-' ) 
+	 {
+		 char sign1 = ' ';
+		 if (big_decimal[0] == '+' || anotherDec.big_decimal[0] == '+')
+		 {
+			 sign1 = '+';
+		 }
+		 
+		 attach_sign(big_decimal);
+		 attach_sign(anotherDec.big_decimal);
+		 
+		 equalize_size(anotherDec.big_decimal);
+
+		 for (int i = big_decimal.length() - 1; i >= 0; i--)
+		 {
+			 res_digit = int(anotherDec.big_decimal[i] - '0') + int(big_decimal[i] - '0') + res_digit;
+			 resultDec = char((res_digit % 10) + '0') + resultDec;
+			 res_digit = res_digit / 10;
+		 }
+		 if (res_digit == 1)
+		 {
+			 resultDec = '1' + resultDec;
+		 }
+
+		 if(sign1 != ' ')
+			 return sign1 + resultDec;
+		 return resultDec;
+	 }
+
+	 if (big_decimal[0] == '-' && anotherDec.big_decimal[0] == '-')
+	 {
+		 char sign1 = '-';
+		 
+		 attach_sign(big_decimal);
+		 attach_sign(anotherDec.big_decimal);
+
+		 equalize_size(anotherDec.big_decimal);
+
+		 for (int i = big_decimal.length() - 1; i >= 0; i--)
+		 {
+			 res_digit = int(anotherDec.big_decimal[i] - '0') + int(big_decimal[i] - '0') + res_digit;
+			 resultDec = char((res_digit % 10) + '0') + resultDec;
+			 res_digit = res_digit / 10;
+		 }
+		 if (res_digit == 1)
+		 {
+			 resultDec = '1' + resultDec;
+		 }
+		 cout << resultDec << endl;
+		 return sign1 + resultDec;
+	 }
+
+	 char sign = ' ';
+	 char sign1 = ' ';
+	 char sign2 = ' ';
+
+	 if (anotherDec.big_decimal[0] == '-' || anotherDec.big_decimal[0] == '+')
+	 {
+		 cout << " 1 true" << endl;
+		 sign1 = anotherDec.big_decimal[0];
+	 }
+
+	 if (big_decimal[0] == '-' || big_decimal[0] == '+')
+	 {
+		 cout << " 2 true" << endl;
+		 sign2 = big_decimal[0];
+	 }
+	   
+	  attach_sign(big_decimal);
+	  attach_sign(anotherDec.big_decimal);
+
+	  if (big_decimal < anotherDec.big_decimal)
+	  {
+		 sign = sign1;
+	  }
+	   
+	  if (big_decimal > anotherDec.big_decimal)
+	  {
+		  sign = sign2;
+	  }
+	 	 
+	 cout << big_decimal << " " << anotherDec.big_decimal;
+	 
+	 equalize_size(anotherDec.big_decimal);
+
+	 for (int i = anotherDec.big_decimal.length() - 1; i >= 0; i--)
+	 {
+		//checking if the number needs to borrow from the next number 
+		if (i == 0)
+		{
+			if (anotherDec.big_decimal[0] < big_decimal[0])
+			{
+				cout << " true" << endl;
+				res_digit = int(big_decimal[i] - '0') - int(anotherDec.big_decimal[i] - '0');   //subtracting the two integers 
+				resultDec = char(res_digit + '0') + resultDec;  //returning result to a string
+				return '-' + resultDec;
+			}
+		}
+
+		int counter = 0;
+
+		while ((anotherDec.big_decimal[i] < big_decimal[i]) && i != 0)
+		{
+			if (anotherDec.big_decimal[i - 1] == '0')
+			{
+				cout << " counter" << counter << endl;
+				counter += 1;
+				i--;
+				if (anotherDec.big_decimal[i - 1] != '0')
+				{
+					 anotherDec.big_decimal[i - 1] -= 1;
+				}
+				continue;
+			}
+
+			if (counter != 0)
+			{
+				for (int j = 0; j < counter; j++)
+				{
+					//cout << " true" << endl;
+					if (anotherDec.big_decimal[i] == '0')
+					{
+						 anotherDec.big_decimal[i] = '9';
+					}
+				   i++;
+				}
+				anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
+
+				break;
+			}
+
+			else
+			{
+				cout << " number: " << anotherDec.big_decimal[i] << endl;
+				anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
+				anotherDec.big_decimal[i - 1] = anotherDec.big_decimal[i - 1] - 1;
+
+			}
+
+		}
+		cout << resultDec << endl;
+		res_digit = int(anotherDec.big_decimal[i] - '0') - int(big_decimal[i] - '0');   //subtracting the two integers 
+		resultDec = char(res_digit + '0') + resultDec;  //returning result to a string
+		cout << " string: " << resultDec << endl << "int :" << res_digit << endl;
+	 }
+
+	 if (sign != ' ')
+	 {
+		return sign + resultDec;
+	 }
+	 return resultDec;
+	   
  }
 
 
