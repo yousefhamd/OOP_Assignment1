@@ -295,48 +295,59 @@ BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 
 
  bool  BigDecimalInt::operator< (BigDecimalInt anotherDec)
- {
-	 string dec2 = anotherDec.get_big_decimal();
+{
+	//checking the negative and the positive number return true if the right hand side is the positive side
+	clear_zeros(big_decimal);
+	clear_zeros(anotherDec.big_decimal);
 
-	 //checking the negative and the positive number return true if the right hand side is the positive side
-	 if ((big_decimal[0] == '-') && (dec2[0] != '-'))
-	 {
-		 return true;
-	 }
-	 else if ((big_decimal[0] != '-') && (dec2[0] == '-'))
-	 {
-		 return false;
-	 }
+	if ((big_decimal[0] == '-') && (anotherDec.big_decimal[0] != '-'))
+	{
+		return true;
+	}
 
-	 else
-	 {
-		 //checking the bigger number by its length and positivity 
-		 if ((big_decimal.length() < dec2.length()) && (big_decimal[0] && dec2[0] != '-'))
-		 {
-			 return true;
-		 }
+	else if ((big_decimal[0] != '-') && (anotherDec.big_decimal[0] == '-'))
+	{
+		return false;
+	}
 
-		 //checking the bigger number by its length and negativity
-		 else if ((big_decimal.length() < dec2.length()) && (big_decimal[0] && dec2[0] == '-'))
-		 {
-			 return false;
-		 }
 
-		 //checking the bigger number by its digits 
-		 else if (big_decimal.length() == dec2.length())
-		 {
-			 if ((int(big_decimal[0] - '0') < int(dec2[0])) && ((big_decimal[0] && dec2[0] != '-')))
-				return true;
-			 if ((int(big_decimal[0] - '0') < int(dec2[0])) && ((big_decimal[0] && dec2[0] == '-')))
-				return false;
-		 }
+	//checking the bigger number by its length and positivity 
+	else if ((big_decimal.length() < anotherDec.big_decimal.length()) && ((big_decimal[0] && anotherDec.big_decimal[0]) != '-'))
+	{
+		return true;
+	}
+	else if ((big_decimal.length() > anotherDec.big_decimal.length()) && ((big_decimal[0] && anotherDec.big_decimal[0]) != '-'))
+	{
+		return false;
+	}
 
-		 else
-		 {
-			 return false;
-		 }
-	 }
- }
+	//checking the bigger number by its length and negativity
+	else if ((big_decimal.length() < anotherDec.big_decimal.length()) && ((big_decimal[0] && anotherDec.big_decimal[0]) == '-'))
+	{
+		return false;
+	}
+
+	//checking the bigger number by its digits 
+	else if (big_decimal.length() == anotherDec.big_decimal.length())
+	{
+		if ((int(big_decimal[0] - '0') < int(anotherDec.big_decimal[0])) && ((big_decimal[0] && anotherDec.big_decimal[0]) != '-'))
+		{
+			return true;
+		}
+			
+		else if ((int(big_decimal[0] - '0') < int(anotherDec.big_decimal[0])) && ((big_decimal[0] && anotherDec.big_decimal[0]) == '-'))
+		{
+			return false;
+		}
+			
+	}
+
+	else
+	{
+		return false;
+	}
+
+}
  
 
 
