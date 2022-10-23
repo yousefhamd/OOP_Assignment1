@@ -2,21 +2,15 @@
 
 int main()
 {
-	BigDecimalInt num1("123456789012345678901234567890");
-	BigDecimalInt num2("-113456789011345678901134567890");
-	cout << (num1 == num2);
-	num1 = num2;
-	cout << num1;
-	
-	result = second - first;
+	BigDecimalInt num1("100910000000");
+	BigDecimalInt num2("00100091000000");
+	cout << (num1 == num2) << endl;
 
-	if (second < first)
-		cout << " true";
+	if (num2 < num1)
+		cout << " true" << endl;
 	else
-		cout << " false";
+		cout << " false" << endl;
 
-	cout<<" num2 - num1 = " << result;
-	
-
+	cout << " num2 - num1 = " << (num1 + num2) << endl;
 	return 0;
 }

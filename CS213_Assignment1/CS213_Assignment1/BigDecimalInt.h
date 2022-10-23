@@ -18,13 +18,17 @@ class BigDecimalInt
 
 	void clear_zeros(string& number);
 
+	string addition(string anotherNumber);
+
+	string subtraction(string firstNumber, string anotherNumber);
+
 public:
 
 	BigDecimalInt();
 
 	BigDecimalInt(string b_d);
 
-	string get_big_decimal() 
+	string get_big_decimal()
 	{
 		return big_decimal;
 	}
@@ -47,5 +51,5 @@ public:
 
 	BigDecimalInt operator= (BigDecimalInt anotherDec);
 
-	
+
 };
