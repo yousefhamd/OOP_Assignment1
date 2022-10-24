@@ -21,7 +21,7 @@ char BigDecimalInt::attach_sign(string& number) {
 	string temp = "";
 	char sign = ' ';
 	for (char digit : number) { // delete the sign from the number
-		if (digit == '-' || digit == '+') {
+		if (digit == '-' || digit == '+' || digit == ' ') {
 			sign = digit;
 			continue;
 		}
@@ -34,15 +34,15 @@ char BigDecimalInt::attach_sign(string& number) {
 
 
 void BigDecimalInt::equalize_size(string& second) {
-	int n_first_zeros = 0, n_second_zeros = 0;
+	int n_zeroz = 0;
 	if (big_decimal.length() > second.length()) {
-		n_first_zeros += big_decimal.length() - second.length();
-		second = string(n_first_zeros, '0') + second;
+		n_zeroz = big_decimal.length() - second.length();
+		second = string(n_zeroz, '0') + second;
 	}
 	else if (big_decimal.length() < second.length())
 	{
-		n_second_zeros += second.length() - big_decimal.length();
-		big_decimal = string(n_second_zeros, '0') + big_decimal;
+		n_zeroz = second.length() - big_decimal.length();
+		big_decimal = string(n_zeroz, '0') + big_decimal;
 	}
 }
 
@@ -58,6 +58,40 @@ void BigDecimalInt::clear_zeros(string& number) {
 	number = temp;
 }
 
+string BigDecimalInt::addition(string anotherNumber) {
+	int result = 0;
+	string res = "";
+	for (int i = anotherNumber.length() - 1; i >= 0; i--)
+	{
+		result = int(anotherNumber[i] - '0') + int(big_decimal[i] - '0') + result;    //adding the two integers 
+		res = char((result % 10) + '0') + res;  //returning result to a string
+		result /= 10;
+	}
+	if (result == 1)
+	{
+		res = '1' + res;
+	}
+	return res;
+}
+
+string BigDecimalInt::subtraction(string firstNumber, string anotherNumber) {
+	int result = 0;
+	string res = "", temp = firstNumber;
+	int counter = 0;
+	for (int i = anotherNumber.length() - 1; i >= 0; i--)
+	{
+		counter = i;
+		while (anotherNumber[counter] > temp[counter])
+		{
+			temp[counter] = temp[counter] + 10;
+			temp[counter - 1]--;
+			counter--;
+		}
+		result = int(temp[i] - '0') - int(anotherNumber[i] - '0');   //subtracting the two integers 
+		res = char(result + '0') + res;  //returning result to a string
+	}
+	return res;
+}
 
 
 int BigDecimalInt::size() {
@@ -76,6 +110,9 @@ int BigDecimalInt::sign() {
 
 
 ostream& operator << (ostream& out, BigDecimalInt b) {
+	char sign = b.attach_sign(b.big_decimal);
+	b.clear_zeros(b.big_decimal);
+	b.big_decimal = sign + b.big_decimal;
 	out << b.big_decimal;
 	return out;
 }
@@ -84,221 +121,103 @@ ostream& operator << (ostream& out, BigDecimalInt b) {
 
 BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 {
-	int result = 0;
-	string res = "";
-	string sign = "";
-	BigDecimalInt result1;
-	
+	char sign1 = attach_sign(big_decimal);
+	char sign2 = attach_sign(anotherDec.big_decimal);
+	equalize_size(anotherDec.big_decimal);
+
+	BigDecimalInt result;
+
 	//case 1: the subtracted number is negative,while the other is positive 
-	if ((anotherDec.big_decimal[0] != '-') && big_decimal[0] == '-')
+	if (sign2 != '-' && sign1 == '-')
 	{
-		char sign1 = big_decimal[0];
-		
-		attach_sign(big_decimal);
-		attach_sign(anotherDec.big_decimal);
-		
-		equalize_size(anotherDec.big_decimal);
-
-		sign += sign1;
-
-		for (int i = anotherDec.big_decimal.length() - 1; i >= 0; i--)
-		{
-			result = int(anotherDec.big_decimal[i] - '0') + int(big_decimal[i] - '0') + result;    //adding the two integers 
-			res = char((result%10) + '0') + res;  //returning result to a string
-			result /= 10;
-		}
-		if (result == 1)
-		{
-			res = '1' + res;
-		}
-
-		return res;	
+		result = BigDecimalInt('-' + addition(anotherDec.big_decimal));
 	}
-	
-	//case 2: second number is negative,while the other is positive 
-	if ((big_decimal[0] != '-') && anotherDec.big_decimal[0] == '-')
+
+	//case 2: the subtracted number is positive,while the other is negative 
+	if (sign2 == '-' && sign1 != '-')
 	{
-		char sign1 = big_decimal[0];
+		result = BigDecimalInt('+' + addition(anotherDec.big_decimal));
+	}
 
-		attach_sign(big_decimal);
-		attach_sign(anotherDec.big_decimal);
-
-		equalize_size(anotherDec.big_decimal);
-		
-		for (int i = anotherDec.big_decimal.length() - 1; i >= 0; i--)
-		{
-			result = int(anotherDec.big_decimal[i] - '0') + int(big_decimal[i] - '0') + result;    //adding the two integers 
-			res = char((result % 10) + '0') + res;  //returning result to a string
-			result = result /10;
-		}
-		if (result == 1)
-		{
-			res = '1' + res;
-		}
-
-		if ( sign1 == '+')
-		{
-			return sign1 + res;
-		}
+	//case 3: two numbers are ngative
+	if (sign1 == '-' && sign2 == '-')
+	{
+		if (big_decimal > anotherDec.big_decimal)
+			result = BigDecimalInt('-' + subtraction(big_decimal, anotherDec.big_decimal));
+		else if (big_decimal < anotherDec.big_decimal)
+			result = BigDecimalInt('+' + subtraction(anotherDec.big_decimal, big_decimal));
 		else
-		{
-			return sign + res;
-		}
-		
+			result = BigDecimalInt("0");
 	}
 
 	//case 3: numbers with positive signs
-	if ((big_decimal[0] == '+') && (anotherDec.big_decimal[0] == '+'))
+	if (sign1 != '-' && sign2 != '-')
 	{
-		sign = '+';
-		attach_sign(big_decimal);
-		attach_sign(anotherDec.big_decimal);
+		if (big_decimal > anotherDec.big_decimal)
+			result = BigDecimalInt('+' + subtraction(big_decimal, anotherDec.big_decimal));
+		else if (big_decimal < anotherDec.big_decimal)
+			result = BigDecimalInt('-' + subtraction(anotherDec.big_decimal, big_decimal));
+		else
+			result = BigDecimalInt("0");
 	}
 
-
-	if (big_decimal < anotherDec.big_decimal)
-	{
-		equalize_size(anotherDec.big_decimal);
-		
-		for (int i = anotherDec.big_decimal.length() - 1; i >= 0; i--)
-		{
-			//checking if the number needs to borrow from the next number 
-
-			if (i == 0)  
-			{
-				//the first digit in the number is smaller than the other one
-				if (anotherDec.big_decimal[0] < big_decimal[0])
-				{
-					result =  int(big_decimal[i] - '0') - int(anotherDec.big_decimal[i] - '0');   //subtracting the two integers 
-					res = char(result + '0') + res;  //returning result to a string
-					return '-' + res;
-				}
-			}
-
-			int counter = 0;
-
-			
-			while ((anotherDec.big_decimal[i] < big_decimal[i] )&& i!=0)
-			{
-				//checking the occurance of zeros in the number
-				if (anotherDec.big_decimal[i - 1] == '0')
-				{
-					counter += 1;
-					i--;
-					if (anotherDec.big_decimal[i - 1] != '0')
-					{
-						anotherDec.big_decimal[i - 1] -= 1;
-					}
-					continue;
-				}
-				
-				if (counter != 0)
-				{
-					//replacing zeros with the bored number from the perivous digit
-					for (int j = 0; j < counter; j++)
-					{
-						
-						if (anotherDec.big_decimal[i] == '0')
-						{
-							anotherDec.big_decimal[i] = '9';
-						}
-						i++;
-					}
-					anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
-
-					break;
-				}
-				//borowing from the pervious digit 
-				else
-				{
-					anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
-					anotherDec.big_decimal[i - 1] = anotherDec.big_decimal[i - 1] - 1;
-				}
-
-			}
-			result = int(anotherDec.big_decimal[i] - '0') - int(big_decimal[i] - '0');   //subtracting the two integers 
-			res = char(result + '0') + res;  //returning result to a string
-		}
-		sign = '-';
-
-		return sign + res;
-	}
-
-
-	//calculating the numbers without signs 
-	 else if((big_decimal > anotherDec.big_decimal) && (big_decimal[0] != ('+' || '-')) && (anotherDec.big_decimal[0] != ('+' || '-')))
-	 {
-
-		equalize_size(anotherDec.big_decimal);
-		
-		for (int i = anotherDec.big_decimal.length() - 1 ; i >= 0; i--)
-		{
-			//checking if the number needs to borrow from the next number 
-			if (i == 0)
-			{
-				//the first digit in the number is smaller than the other one
-				if (big_decimal[0] < anotherDec.big_decimal[0])
-				{
-					result = int(anotherDec.big_decimal[i] - '0') - int(big_decimal[i] - '0') ;   //subtracting the two integers 
-					res = char(result + '0') + res;  //returning result to a string
-					return '-' + res;
-				}
-
-			}
-
-			int counter = 0;
-	
-			while ((big_decimal[i] < anotherDec.big_decimal[i] && i!=0))
-			{
-				//checking the occurance of zeros in the number
-				if (big_decimal[i - 1] == '0')
-				{
-					counter += 1;
-					i--;
-					if (big_decimal[i - 1] != '0') 
-					{
-						big_decimal[i - 1] -= 1;
-					}
-					continue;
-				}
-
-				if (counter != 0)
-				{
-					//replacing zeros with the bored number from the perivous digit
-					for (int j = 0; j < counter ; j++) 
-					{
-						if (big_decimal[i] == '0')
-						{
-							big_decimal[i] = '9';
-						} 
-						i++;
-					}
-					big_decimal[i] = big_decimal[i] + 10;
-
-					break;
-				}
-
-				else
-				{
-					//borowing from the pervious digit 
-					big_decimal[i] = big_decimal[i] + 10;
-					big_decimal[i - 1] = big_decimal[i - 1] - 1;
-				}
-				
-			}
-			result = int(big_decimal[i]-'0') - int(anotherDec.big_decimal[i]-'0');   //subtracting the two integers 
-			res = char(result + '0') + res;  //returning result to a string
-		}
-		return  sign + res;
-     }
+	sign2 = attach_sign(result.big_decimal);
+	clear_zeros(result.big_decimal);
+	big_decimal = sign1 + big_decimal;
+	result.big_decimal = sign2 + result.big_decimal;
+	return result;
 }
 
+BigDecimalInt BigDecimalInt::operator+ (BigDecimalInt anotherDec)
+{
+	char sign1 = attach_sign(big_decimal);
+	char sign2 = attach_sign(anotherDec.big_decimal);
+	equalize_size(anotherDec.big_decimal);
 
- bool  BigDecimalInt::operator< (BigDecimalInt anotherDec)
+	BigDecimalInt result;
+
+	//positive numbers only
+	if (sign1 != '-' && sign2 != '-')
+	{
+		string res = addition(anotherDec.big_decimal);
+		result = BigDecimalInt('+' + res);
+	}
+
+	//negative numbers only
+	if (sign1 == '-' && sign2 == '-')
+	{
+		result = BigDecimalInt('-' + addition(anotherDec.big_decimal));
+	}
+
+	if (sign1 != '-' && sign2 == '-') {
+		if (big_decimal > anotherDec.big_decimal)
+			result = BigDecimalInt('+' + subtraction(big_decimal, anotherDec.big_decimal));
+		else if (big_decimal < anotherDec.big_decimal)
+			result = BigDecimalInt('-' + subtraction(anotherDec.big_decimal, big_decimal));
+		else
+			result = BigDecimalInt("0");
+	}
+
+	if (sign1 == '-' && sign2 != '-') {
+		if (big_decimal > anotherDec.big_decimal)
+			result = BigDecimalInt('-' + subtraction(big_decimal, anotherDec.big_decimal));
+		else if (big_decimal < anotherDec.big_decimal)
+			result = BigDecimalInt('+' + subtraction(anotherDec.big_decimal, big_decimal));
+		else
+			result = BigDecimalInt("0");
+	}
+
+	sign2 = attach_sign(result.big_decimal);
+	clear_zeros(result.big_decimal);
+	big_decimal = sign1 + big_decimal;
+	result.big_decimal = sign2 + result.big_decimal;
+	return result;
+}
+
+bool  BigDecimalInt::operator< (BigDecimalInt anotherDec)
 {
 	//checking the negative and the positive number return true if the right hand side is the positive side
-	clear_zeros(big_decimal);
-	clear_zeros(anotherDec.big_decimal);
+	equalize_size(anotherDec.big_decimal);
 
 	if ((big_decimal[0] == '-') && (anotherDec.big_decimal[0] != '-'))
 	{
@@ -310,36 +229,20 @@ BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 		return false;
 	}
 
-
-	//checking the bigger number by its length and positivity 
-	else if ((big_decimal.length() < anotherDec.big_decimal.length()) && ((big_decimal[0] && anotherDec.big_decimal[0]) != '-'))
-	{
-		return true;
-	}
-	else if ((big_decimal.length() > anotherDec.big_decimal.length()) && ((big_decimal[0] && anotherDec.big_decimal[0]) != '-'))
-	{
-		return false;
-	}
-
-	//checking the bigger number by its length and negativity
-	else if ((big_decimal.length() < anotherDec.big_decimal.length()) && ((big_decimal[0] && anotherDec.big_decimal[0]) == '-'))
-	{
-		return false;
-	}
-
 	//checking the bigger number by its digits 
 	else if (big_decimal.length() == anotherDec.big_decimal.length())
 	{
-		if ((int(big_decimal[0] - '0') < int(anotherDec.big_decimal[0])) && ((big_decimal[0] && anotherDec.big_decimal[0]) != '-'))
-		{
-			return true;
+		for (int i = 0; i < big_decimal.length(); i++) {
+			if ((int(big_decimal[i] - '0') < int(anotherDec.big_decimal[i])) && ((big_decimal[i] && anotherDec.big_decimal[i]) != '-'))
+			{
+				return true;
+			}
+
+			else if ((int(big_decimal[i] - '0') < int(anotherDec.big_decimal[i])) && ((big_decimal[i] && anotherDec.big_decimal[i]) == '-'))
+			{
+				return false;
+			}
 		}
-			
-		else if ((int(big_decimal[0] - '0') < int(anotherDec.big_decimal[0])) && ((big_decimal[0] && anotherDec.big_decimal[0]) == '-'))
-		{
-			return false;
-		}
-			
 	}
 
 	else
@@ -348,354 +251,77 @@ BigDecimalInt BigDecimalInt::operator- (BigDecimalInt anotherDec)
 	}
 
 }
- 
 
 
- BigDecimalInt BigDecimalInt::operator+ (BigDecimalInt anotherDec)
- {
-	 //BigDecimalInt
-	 string resultDec;
-	 int res_digit = 0;
+bool BigDecimalInt::operator> (BigDecimalInt anotherDec)
+{
+	char sign_first = attach_sign(big_decimal);
+	char sign_second = attach_sign(anotherDec.big_decimal);
+	equalize_size(anotherDec.big_decimal);
 
-	 
-
-	 //case 1: without a sign
-	 if (big_decimal[0] && anotherDec.big_decimal[0] != ('+' || '-'))
-	 {
-		 equalize_size(anotherDec.big_decimal);
-		 for (int i = big_decimal.length() - 1; i >= 0; i--)
-		 {
-			 res_digit = int(anotherDec.big_decimal[i] - '0') + int(big_decimal[i] - '0') + res_digit;
-			 resultDec = char((res_digit % 10) + '0') + resultDec;
-			 res_digit = res_digit / 10;
-		 }
-		 if (res_digit == 1)
-		 {
-			 resultDec = '1' + resultDec;
-		 }
-		 return resultDec;
-	 }
-		 //case 2:both positive or both negative
-	 if (big_decimal[0] && anotherDec.big_decimal[0] == ('+' || '-'))
-	 {
-		
-		 if (big_decimal[0] && anotherDec.big_decimal[0] == '+')
-		 {
-			 string sign1 = "+";
-		 }
-
-		 else if (big_decimal[0] && anotherDec.big_decimal[0] == '-')
-		 {
-			 string sign2 = "-";
-		 }
-
-		 attach_sign(big_decimal);
-		 attach_sign(anotherDec.big_decimal);
-
-		 equalize_size(anotherDec.big_decimal);
-
-		for (int i = big_decimal.length() - 1; i > 0; i--)
+	if (sign_first != '-' && sign_second == '-') {
+		goto rebuild_yes;
+	}
+	else if (sign_first == '-' && sign_second != '-') {
+		goto rebuild_no;
+	}
+	else if (sign_first != '-' && sign_second != '-')
+	{
+		for (int i = 0; i < anotherDec.big_decimal.length(); i++)
 		{
-			res_digit = int(anotherDec.big_decimal[i] - '0') + int(big_decimal[i] - '0') + res_digit;
-			resultDec = char((res_digit % 10) + '0') + resultDec;
-			res_digit = res_digit / 10;
-		}
-		if (res_digit == 1)
-		{
-			resultDec = '1' + resultDec;
-		}
-			 
-	 }
-	 else
-	 {
-		 if (big_decimal < anotherDec.big_decimal)
-		 {
-			 char sign = anotherDec.big_decimal[0];
-
-			 attach_sign(big_decimal);
-			 attach_sign(anotherDec.big_decimal);
-
-			 equalize_size(anotherDec.big_decimal);
-
-			 for (int i = anotherDec.big_decimal.length() - 1; i >= 0; i--)
-			 {
-				 //checking if the number needs to borrow from the next number 
-				 while (big_decimal[i] > anotherDec.big_decimal[i])
-				 {
-					 anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
-					 anotherDec.big_decimal[i - 1] = anotherDec.big_decimal[i - 1] - 1;
-				 }
-				 cout << big_decimal << " " << anotherDec.big_decimal << endl;
-				 res_digit = int(anotherDec.big_decimal[i] - '0') - int(big_decimal[i] - '0');   //subtracting the two integers 
-				 resultDec = char(res_digit + '0') + resultDec;  //returning result to a string
-			 }
-			 return sign + resultDec;
-		 }
-		 
-		char sign = big_decimal[0];
-
-		attach_sign(big_decimal);
-		attach_sign(anotherDec.big_decimal);
-
-		equalize_size(anotherDec.big_decimal);
-
-		for (int i = anotherDec.big_decimal.length() - 1; i >= 0; i--)
-		{
-			//checking if the number needs to borrow from the next number 
-		    while (big_decimal[i] < anotherDec.big_decimal[i])
-		    {
-				big_decimal[i - 1] -= 1;
-				big_decimal[i] += 10;
-
-		    }
-			res_digit = int(big_decimal[i] - '0') - int(anotherDec.big_decimal[i] - '0');   //subtracting the two integers 
-			resultDec = char(res_digit + '0') + resultDec;  //returning result to a string
-		}
-		return sign + resultDec ;
-		
-	 }
- }BigDecimalInt BigDecimalInt::operator+ (BigDecimalInt anotherDec)
- {
-	 //BigDecimalInt
-	 string resultDec;
-	 int res_digit = 0;
-
-	 //positive numbers only
-	 if(big_decimal[0] != '-' && anotherDec.big_decimal[0] != '-' ) 
-	 {
-		 char sign1 = ' ';
-		 if (big_decimal[0] == '+' || anotherDec.big_decimal[0] == '+')
-		 {
-			 sign1 = '+';
-		 }
-		 
-		 attach_sign(big_decimal);
-		 attach_sign(anotherDec.big_decimal);
-		 
-		 equalize_size(anotherDec.big_decimal);
-
-		 for (int i = big_decimal.length() - 1; i >= 0; i--)
-		 {
-			 res_digit = int(anotherDec.big_decimal[i] - '0') + int(big_decimal[i] - '0') + res_digit;
-			 resultDec = char((res_digit % 10) + '0') + resultDec;
-			 res_digit = res_digit / 10;
-		 }
-		 if (res_digit == 1)
-		 {
-			 resultDec = '1' + resultDec;
-		 }
-
-		 if(sign1 != ' ')
-			 return sign1 + resultDec;
-		 return resultDec;
-	 }
-
-	 if (big_decimal[0] == '-' && anotherDec.big_decimal[0] == '-')
-	 {
-		 char sign1 = '-';
-		 
-		 attach_sign(big_decimal);
-		 attach_sign(anotherDec.big_decimal);
-
-		 equalize_size(anotherDec.big_decimal);
-
-		 for (int i = big_decimal.length() - 1; i >= 0; i--)
-		 {
-			 res_digit = int(anotherDec.big_decimal[i] - '0') + int(big_decimal[i] - '0') + res_digit;
-			 resultDec = char((res_digit % 10) + '0') + resultDec;
-			 res_digit = res_digit / 10;
-		 }
-		 if (res_digit == 1)
-		 {
-			 resultDec = '1' + resultDec;
-		 }
-		 cout << resultDec << endl;
-		 return sign1 + resultDec;
-	 }
-
-	 char sign = ' ';
-	 char sign1 = ' ';
-	 char sign2 = ' ';
-
-	 if (anotherDec.big_decimal[0] == '-' || anotherDec.big_decimal[0] == '+')
-	 {
-		 cout << " 1 true" << endl;
-		 sign1 = anotherDec.big_decimal[0];
-	 }
-
-	 if (big_decimal[0] == '-' || big_decimal[0] == '+')
-	 {
-		 cout << " 2 true" << endl;
-		 sign2 = big_decimal[0];
-	 }
-	   
-	  attach_sign(big_decimal);
-	  attach_sign(anotherDec.big_decimal);
-
-	  if (big_decimal < anotherDec.big_decimal)
-	  {
-		 sign = sign1;
-	  }
-	   
-	  if (big_decimal > anotherDec.big_decimal)
-	  {
-		  sign = sign2;
-	  }
-	 	 
-	 cout << big_decimal << " " << anotherDec.big_decimal;
-	 
-	 equalize_size(anotherDec.big_decimal);
-
-	 for (int i = anotherDec.big_decimal.length() - 1; i >= 0; i--)
-	 {
-		//checking if the number needs to borrow from the next number 
-		if (i == 0)
-		{
-			if (anotherDec.big_decimal[0] < big_decimal[0])
-			{
-				cout << " true" << endl;
-				res_digit = int(big_decimal[i] - '0') - int(anotherDec.big_decimal[i] - '0');   //subtracting the two integers 
-				resultDec = char(res_digit + '0') + resultDec;  //returning result to a string
-				return '-' + resultDec;
+			if (big_decimal[i] > anotherDec.big_decimal[i]) {
+				goto rebuild_yes;
+			}
+			else if (big_decimal[i] < anotherDec.big_decimal[i]) {
+				goto rebuild_no;
 			}
 		}
-
-		int counter = 0;
-
-		while ((anotherDec.big_decimal[i] < big_decimal[i]) && i != 0)
+	}
+	else if (sign_first == '-' && sign_second == '-')
+	{
+		for (int i = 0; i < anotherDec.big_decimal.length(); i++)
 		{
-			if (anotherDec.big_decimal[i - 1] == '0')
-			{
-				cout << " counter" << counter << endl;
-				counter += 1;
-				i--;
-				if (anotherDec.big_decimal[i - 1] != '0')
-				{
-					 anotherDec.big_decimal[i - 1] -= 1;
-				}
-				continue;
+			if (big_decimal[i] < anotherDec.big_decimal[i]) {
+				goto rebuild_yes;
 			}
-
-			if (counter != 0)
-			{
-				for (int j = 0; j < counter; j++)
-				{
-					//cout << " true" << endl;
-					if (anotherDec.big_decimal[i] == '0')
-					{
-						 anotherDec.big_decimal[i] = '9';
-					}
-				   i++;
-				}
-				anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
-
-				break;
+			else if (big_decimal[i] > anotherDec.big_decimal[i]) {
+				goto rebuild_no;
 			}
-
-			else
-			{
-				cout << " number: " << anotherDec.big_decimal[i] << endl;
-				anotherDec.big_decimal[i] = anotherDec.big_decimal[i] + 10;
-				anotherDec.big_decimal[i - 1] = anotherDec.big_decimal[i - 1] - 1;
-
-			}
-
 		}
-		cout << resultDec << endl;
-		res_digit = int(anotherDec.big_decimal[i] - '0') - int(big_decimal[i] - '0');   //subtracting the two integers 
-		resultDec = char(res_digit + '0') + resultDec;  //returning result to a string
-		cout << " string: " << resultDec << endl << "int :" << res_digit << endl;
-	 }
-
-	 if (sign != ' ')
-	 {
-		return sign + resultDec;
-	 }
-	 return resultDec;
-	   
- }
+	}
+	return false;
+rebuild_yes:
+	big_decimal = sign_first + big_decimal;
+	return true;
+rebuild_no:
+	big_decimal = sign_first + big_decimal;
+	return false;
+}
 
 
 
- bool BigDecimalInt::operator> (BigDecimalInt anotherDec)
- {
-	 char sign_first = attach_sign(big_decimal);
-	 char sign_second = attach_sign(anotherDec.big_decimal);
-	 equalize_size(anotherDec.big_decimal);
-	 if ((sign_first == '+' || sign_first == ' ') && sign_second == '-') {
-		 goto rebuild_yes;
-	 }
-	 else if (sign_first == '-' && (sign_second == '+' || sign_second == ' ')) {
-		 goto rebuild_no;
-	 }
-	 else if ((sign_first == '+' || sign_first == ' ') && (sign_second == '+' || sign_second == ' '))
-	 {
-		 for (int i = 0; i < anotherDec.big_decimal.length(); i++)
-		 {
-			 if (big_decimal[i] > anotherDec.big_decimal[i]) {
-				 goto rebuild_yes;
-			 }
-			 else if (big_decimal[i] < anotherDec.big_decimal[i]) {
-				 goto rebuild_no;
-			 }
-		 }
-	 }
-	 else if (sign_first == '-' && sign_second == '-')
-	 {
-		 for (int i = 0; i < anotherDec.big_decimal.length(); i++)
-		 {
-			 if (big_decimal[i] < anotherDec.big_decimal[i]) {
-				 goto rebuild_yes;
-			 }
-			 else if (big_decimal[i] > anotherDec.big_decimal[i]) {
-				 goto rebuild_no;
-			 }
-		 }
-	 }
-	 return false;
- rebuild_yes:
-	 clear_zeros(big_decimal);
-	 clear_zeros(anotherDec.big_decimal);
-	 big_decimal = sign_first + big_decimal;
-	 anotherDec.big_decimal = sign_second + anotherDec.big_decimal;
-	 return true;
- rebuild_no:
-	 clear_zeros(big_decimal);
-	 clear_zeros(anotherDec.big_decimal);
-	 big_decimal = sign_first + big_decimal;
-	 anotherDec.big_decimal = sign_second + anotherDec.big_decimal;
-	 return false;
- }
+bool BigDecimalInt::operator== (BigDecimalInt anotherDec) {
+	char sign_first = attach_sign(big_decimal);
+	char sign_second = attach_sign(anotherDec.big_decimal);
+	if ((sign_first != '-' && sign_second == '-') || (sign_first == '-' && sign_second != '-'))
+		goto no;
+	else {
+		if (big_decimal == anotherDec.big_decimal)
+			goto yes;
+		else
+			goto no;
+	}
+yes:
+	big_decimal = sign_first + big_decimal;
+	return true;
+no:
+	big_decimal = sign_first + big_decimal;
+	return false;
+}
 
 
 
- bool BigDecimalInt::operator== (BigDecimalInt anotherDec) {
-	 char sign_first = attach_sign(big_decimal);
-	 char sign_second = attach_sign(anotherDec.big_decimal);
-	 if (((sign_first == ' ' || sign_first == '+') && sign_second == '-') || (sign_first == '-' && (sign_second == ' ' || sign_second == '+')))
-		 goto no;
-	 else {
-		 if (big_decimal == anotherDec.big_decimal)
-			 goto yes;
-		 else
-			 goto no;
-	 }
- yes:
-	 clear_zeros(big_decimal);
-	 clear_zeros(anotherDec.big_decimal);
-	 big_decimal = sign_first + big_decimal;
-	 anotherDec.big_decimal = sign_second + anotherDec.big_decimal;
-	 return true;
- no:
-	 clear_zeros(big_decimal);
-	 clear_zeros(anotherDec.big_decimal);
-	 big_decimal = sign_second + anotherDec.big_decimal;
-	 return false;
- }
-
-
-
- BigDecimalInt BigDecimalInt::operator= (BigDecimalInt anotherDec) {
-	 big_decimal = anotherDec.big_decimal;
-	 return *this;
- }
+BigDecimalInt BigDecimalInt::operator= (BigDecimalInt anotherDec) {
+	big_decimal = anotherDec.big_decimal;
+	return *this;
+}
